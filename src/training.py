@@ -1,4 +1,4 @@
-from preprocessing_data import preprocessing
+from src.preprocessing_data import preprocessing
 from pathlib import Path
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
@@ -7,6 +7,7 @@ from sklearn.pipeline import make_pipeline
 
 BASE_DIR=Path(__file__).resolve().parent.parent
 DATA_PATH=BASE_DIR/'Data'/'customerchurn.csv'
+MODEL_PATH=BASE_DIR/'model.pkl'
 
 data=pd.read_csv(DATA_PATH)
 
@@ -28,12 +29,15 @@ X=data.drop(columns=['Churn'])
 y=data['Churn']
 
 
-final_pipeline=make_pipeline(preprocessing,
-                             LogisticRegression(C=1,class_weight='balanced',penalty='l2',solver='lbfgs',max_iter=1000)
+final_pipeline=make_pipeline(
+                             preprocessing,
+                             LogisticRegression(C=1,class_weight='balanced',solver='lbfgs',max_iter=1000)
                              )
 
 
 
 final_pipeline.fit(X,y)
 
-joblib.dump(final_pipeline,'model.pkl')
+joblib.dump(final_pipeline,MODEL_PATH)
+
+print(f'Model trained and saved to: {MODEL_PATH}')
