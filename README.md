@@ -75,7 +75,7 @@ Categorical features are encoded using:
 OneHotEncoder(handle_unknown="ignore")
 ```
 
-The preprocessing steps and model are combined using a scikit-learn pipeline.
+The preprocessing steps  and model are combined using a scikit-learn pipeline.
 
 ---
 
