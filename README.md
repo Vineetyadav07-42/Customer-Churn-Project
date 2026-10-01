@@ -1,12 +1,12 @@
 # Customer Churn Prediction
 
-An end-to-end machine learning project that predicts whether a telecom customer is likely to churn. The project covers data preprocessing, model comparison, hyperparameter tuning, FastAPI API development, Docker containerization, and cloud deployment using Render.
+An end-to-end machine learning project that predicts whether a telecom customer is likely to churn. The project covers data preprocessing, model comparison, hyperparameter tuning, FastAPI API development, Docker containerization, CI/CD, and cloud deployment using AWS.
 
 ## Live Demo
 
-**Live API:** https://customer-churn-project-a4xu.onrender.com
+**Live API:** http://13.234.69.92:8002
 
-**Swagger Documentation:** https://customer-churn-project-a4xu.onrender.com/docs
+**Swagger Documentation:** http://13.234.69.92:8002/docs
 
 ---
 
@@ -14,7 +14,7 @@ An end-to-end machine learning project that predicts whether a telecom customer 
 
 The objective of this project is to predict customer churn based on demographic, service, contract, and billing information.
 
-The final preprocessing and machine learning model are combined into a single scikit-learn pipeline and saved as `model.pkl`. The trained model is then exposed through a FastAPI REST API, containerized using Docker, and deployed on Render.
+The final preprocessing and machine learning model are combined into a single scikit-learn pipeline and saved as `model.pkl`. The trained model is then exposed through a FastAPI REST API, containerized using Docker, and deployed on AWS EC2.
 
 ### Workflow
 
@@ -33,7 +33,11 @@ FastAPI
    ↓
 Docker
    ↓
-Render
+CI/CD Pipeline
+   ↓
+AWS ECR
+   ↓
+AWS EC2
    ↓
 Live API
 ```
@@ -75,7 +79,7 @@ Categorical features are encoded using:
 OneHotEncoder(handle_unknown="ignore")
 ```
 
-The preprocessing steps  and model are combined using a scikit-learn pipeline.
+The preprocessing steps and model are combined using a scikit-learn pipeline.
 
 ---
 
@@ -132,10 +136,10 @@ The final model was evaluated using:
 
 ### Final Test Score
 
-|   Metric   |    Score     |
-| ---------: | -----------: |
-|  Recall    |    0.7834    |
-|  F1-Score  |    0.6136    |
+| Metric   |  Score |
+| -------- | -----: |
+| Recall   | 0.7834 |
+| F1-Score | 0.6136 |
 
 > **Note:** The Recall/F1 scores above are from the held-out 20% test split, computed before the final retrain. The deployed model (`model.pkl`) was then retrained on the full dataset using the selected hyperparameters.
 
@@ -145,6 +149,7 @@ The final model was evaluated using:
 
 ```text
 Customer_Churn_Prediction_Resume/
+
 │
 ├── Data/
 │   └── customerchurn.csv
@@ -158,6 +163,10 @@ Customer_Churn_Prediction_Resume/
 │   ├── preprocessing_data.py
 │   ├── training.py
 │   └── app.py
+│
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
 │
 ├── model.pkl
 ├── Dockerfile
@@ -232,10 +241,10 @@ FastAPI provides interactive API documentation at:
 http://localhost:8000/docs
 ```
 
-For the deployed API:
+For the deployed AWS API:
 
 ```text
-https://customer-churn-project-a4xu.onrender.com/docs
+http://13.234.69.92:8002/docs
 ```
 
 ---
@@ -246,6 +255,7 @@ https://customer-churn-project-a4xu.onrender.com/docs
 
 ```bash
 git clone https://github.com/Vineetyadav07-42/Customer-Churn-Project.git
+
 cd Customer_Churn_Prediction_Resume
 ```
 
@@ -317,29 +327,140 @@ http://localhost:8000
 
 ---
 
-## Deployment
+## CI/CD Pipeline
 
-The application is containerized using Docker and deployed on **Render**.
+The project uses **GitHub Actions** to automate the build and deployment process.
 
-**Live API:** https://customer-churn-project-a4xu.onrender.com
+The workflow configuration is located at:
 
-**Swagger Documentation:** https://customer-churn-project-a4xu.onrender.com/docs
+```text
+.github/workflows/deploy.yml
+```
+
+Whenever changes are pushed to the GitHub repository, the CI/CD workflow automates the deployment process.
+
+The deployment process includes:
+
+```text
+Code Push to GitHub
+        ↓
+GitHub Actions
+        ↓
+Build Docker Image
+        ↓
+Push Docker Image to AWS ECR
+        ↓
+Connect to AWS EC2
+        ↓
+Pull Updated Docker Image
+        ↓
+Stop/Replace Previous Container
+        ↓
+Run Updated Container
+        ↓
+Live FastAPI Application
+```
+
+This eliminates the need to manually perform the Docker build, ECR push, and EC2 deployment steps after every code change.
+
+---
+
+## Cloud Deployment
+
+The application is deployed using **AWS ECR and AWS EC2**.
+
+The deployment architecture is:
+
+```text
+GitHub Repository
+       ↓
+GitHub Actions CI/CD
+       ↓
+Docker Build
+       ↓
+AWS ECR
+       ↓
+AWS EC2
+       ↓
+Docker Container
+       ↓
+FastAPI
+       ↓
+Logistic Regression Model
+       ↓
+Prediction
+```
+
+### AWS Components
+
+* **AWS ECR** – Stores the Docker image.
+* **AWS EC2** – Hosts and runs the Docker container.
+* **GitHub Actions** – Automates the CI/CD deployment process.
+* **AWS Elastic IP** – Provides a stable public IP address for the deployed API.
+
+### Container Port Mapping
+
+The FastAPI application runs on port `8000` inside the Docker container.
+
+The EC2 instance exposes the application externally on port `8002`.
+
+```text
+EC2 Port 8002
+      ↓
+Docker Port 8000
+      ↓
+FastAPI
+```
+
+### Live Application
+
+**API:**
+
+```text
+http://13.234.69.92:8002
+```
+
+**Swagger UI:**
+
+```text
+http://13.234.69.92:8002/docs
+```
+
+The application uses an **AWS Elastic IP** to provide a stable public IP address for the deployed API.
 
 ---
 
 ## Technologies
 
+### Machine Learning
+
 * Python
 * Pandas
 * NumPy
 * Scikit-learn
+* Logistic Regression
+* Decision Tree
+* Random Forest
+* XGBoost
+* GridSearchCV
+* Joblib
+
+### API
+
 * FastAPI
 * Pydantic
 * Uvicorn
-* Joblib
+
+### Deployment & DevOps
+
 * Docker
-* Git & GitHub
-* Render
+* Git
+* GitHub
+* GitHub Actions
+* CI/CD
+* AWS ECR
+* AWS EC2
+* AWS Elastic IP
 
 ---
 
@@ -347,4 +468,6 @@ The application is containerized using Docker and deployed on **Render**.
 
 **Vineet Yadav**
 
-GitHub: Vineetyadav07-42
+Machine Learning / ML Engineering Portfolio Project
+
+**GitHub:** https://github.com/Vineetyadav07-42
