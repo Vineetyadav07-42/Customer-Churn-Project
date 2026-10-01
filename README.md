@@ -14,7 +14,7 @@ An end-to-end machine learning project that predicts whether a telecom customer 
 
 The objective of this project is to predict customer churn based on demographic, service, contract, and billing information.
 
-The final preprocessing and machine learning model are combined into a single scikit-learn pipeline and saved as `model.pkl`. The trained model is then exposed through a FastAPI REST API, containerized using Docker, and deployed on AWS EC2.
+The final preprocessing and  machine learning model are combined into a single scikit-learn pipeline and saved as `model.pkl`. The trained model is then exposed through a FastAPI REST API, containerized using Docker, and deployed on AWS EC2.
 
 ### Workflow
 
